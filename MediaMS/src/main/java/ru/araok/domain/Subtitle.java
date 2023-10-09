@@ -24,12 +24,11 @@ public class Subtitle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "CONTENT_ID")
-    private Long contentId;
-
     private String line;
 
+    @Column(name = "TO_BEGIN")
     private Long to;
 
+    @Column(name = "FROM_END")
     private Long from;
 }
