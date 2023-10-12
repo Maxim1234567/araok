@@ -19,13 +19,16 @@ public class ContentMediaServiceImpl implements ContentMediaService {
     public ContentMediaDto findContentMediaById(ContentMediaIdDto contentMediaIdDto) {
         ContentMediaId contentMediaId = ContentMediaIdDto.toDomainObject(contentMediaIdDto);
 
-        System.out.println("contentMediaRepository.findByContentMediaId 1");
-
         ContentMedia contentMedia = contentMediaRepository.findByContentMediaId(contentMediaId);
 
-        System.out.println("contentMediaRepository.findByContentMediaId 2");
-
         return ContentMediaDto.toDto(contentMedia);
+    }
+
+    @Override
+    public byte[] findMediaByContentMediaId(ContentMediaIdDto contentMediaId) {
+        return contentMediaRepository.findMediaByContentMediaId(
+                ContentMediaIdDto.toDomainObject(contentMediaId)
+        );
     }
 
     @Override

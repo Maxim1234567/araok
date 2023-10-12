@@ -178,4 +178,14 @@ public class ContentMediaRepositoryJpaTest {
         assertArrayEquals(contentMediaImage.getMedia(), contentMedia.getMedia());
         assertArrayEquals(contentMediaVideo.getMedia(), videoContentMedia.getMedia());
     }
+
+    @Test
+    public void shouldCorrectReturnMediaByContentMediaId() {
+        contentMediaRepository.save(contentMedia);
+        contentMediaRepository.save(videoContentMedia);
+
+        byte[] media = contentMediaRepository.findMediaByContentMediaId(videoContentMedia.getContentMediaId());
+
+        assertArrayEquals(media, videoContentMedia.getMedia());
+    }
 }

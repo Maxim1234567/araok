@@ -16,6 +16,7 @@ import ru.araok.service.impl.ContentMediaServiceImpl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -99,6 +100,24 @@ public class ContentMediaServiceTest {
                 .save(any(ContentMedia.class));
 
         assertEqualsContentMedia(result);
+    }
+
+    @Test
+    public void shouldCorrectReturnMediaByContentMediaId() {
+        ContentMediaIdDto contentMediaId = ContentMediaIdDto.toDto(
+                contentMedia.getContentMediaId()
+        );
+
+        given(contentMediaRepository.findMediaByContentMediaId(any(ContentMediaId.class)))
+                .willReturn(contentMedia.getMedia());
+
+        byte[] media = contentMediaService
+                .findMediaByContentMediaId(contentMediaId);
+
+        verify(contentMediaRepository, times(1))
+                .findMediaByContentMediaId(any(ContentMediaId.class));
+
+        assertArrayEquals(media, contentMedia.getMedia());
     }
 
     private void assertEqualsContentMedia(ContentMediaDto result) {

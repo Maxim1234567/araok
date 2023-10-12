@@ -13,4 +13,7 @@ public interface ContentMediaRepository extends JpaRepository<ContentMedia, Cont
 
     @Query("select cm from ContentMedia cm where cm.contentMediaId.mediaType.id = :typeId")
     List<ContentMedia> findByTypeId(@Param("typeId") Long typeId);
+
+    @Query("select cm.media from ContentMedia cm where cm.contentMediaId = :contentMediaId")
+    byte[] findMediaByContentMediaId(ContentMediaId contentMediaId);
 }
