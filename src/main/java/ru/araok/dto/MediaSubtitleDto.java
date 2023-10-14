@@ -16,7 +16,7 @@ import java.util.List;
 public class MediaSubtitleDto {
     private Long id;
 
-    private Long contentId;
+    private ContentDto content;
 
     private LanguageDto language;
 
@@ -29,7 +29,9 @@ public class MediaSubtitleDto {
 
         return MediaSubtitle.builder()
                 .id(dto.id)
-                .contentId(dto.contentId)
+                .content(
+                        ContentDto.toDomainObject(dto.getContent())
+                )
                 .language(
                         LanguageDto.toDomainObject(dto.language)
                 )
@@ -44,7 +46,9 @@ public class MediaSubtitleDto {
 
         return MediaSubtitleDto.builder()
                 .id(mediaSubtitle.getId())
-                .contentId(mediaSubtitle.getContentId())
+                .content(
+                        ContentDto.toDto(mediaSubtitle.getContent())
+                )
                 .language(
                         LanguageDto.toDto(mediaSubtitle.getLanguage())
                 )

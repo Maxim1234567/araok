@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,25 +17,33 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "USERS")
+@Table(name = "CONTENT")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Content {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    private String phone;
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "LIMIT_ID")
+    private AgeLimit limit;
 
-    private String password;
+    private String artist;
 
-    @Column(name = "birth_date")
-    private LocalDate birthDate;
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
-    private String role;
+    @Column(name = "CREATE_DATE")
+    private LocalDate createDate;
+
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "LANGUAGE_ID")
+    private Language language;
 }

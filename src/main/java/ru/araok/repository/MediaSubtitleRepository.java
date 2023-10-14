@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MediaSubtitleRepository extends JpaRepository<MediaSubtitle, Long> {
-    @Query("select ms from MediaSubtitle ms where ms.contentId = :contentId")
+    @Query("select ms from MediaSubtitle ms where ms.content.id = :contentId")
     List<MediaSubtitle> findByContentId(@Param("contentId") long contentId);
 
     @Query("select ms from MediaSubtitle ms where ms.language.id = :languageId")
     List<MediaSubtitle> findByLanguageId(@Param("languageId") long languageId);
 
-    @Query("select ms from MediaSubtitle ms where ms.contentId = :contentId and ms.language.id = :languageId")
+    @Query("select ms from MediaSubtitle ms where ms.content.id = :contentId and ms.language.id = :languageId")
     Optional<MediaSubtitle> findByContentIdAndLanguageId(
             @Param("contentId") long contentId,
             @Param("languageId") long languageId

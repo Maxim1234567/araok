@@ -5,14 +5,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import ru.araok.domain.AgeLimit;
+import ru.araok.domain.Content;
 import ru.araok.domain.ContentMedia;
 import ru.araok.domain.ContentMediaId;
+import ru.araok.domain.Language;
 import ru.araok.domain.MediaType;
+import ru.araok.domain.User;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static ru.araok.Utils.assertEqualsContent;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -20,6 +26,9 @@ public class ContentMediaRepositoryJpaTest {
 
     @Autowired
     private ContentMediaRepository contentMediaRepository;
+
+    @Autowired
+    private ContentRepository contentRepository;
 
     private byte[] image = {
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -59,13 +68,46 @@ public class ContentMediaRepositoryJpaTest {
 
     @BeforeEach
     public void setUp() {
+        AgeLimit limit = AgeLimit.builder()
+                .id(1L)
+                .description("for children under 6 years of age")
+                .limit(0L)
+                .build();
+
+        User user = User.builder()
+                .id(1L)
+                .name("Maxim")
+                .phone("89993338951")
+                .password("12345")
+                .birthDate(LocalDate.of(1994, 8, 5))
+                .role("USER")
+                .build();
+
+        Language language = Language.builder()
+                .id(1L)
+                .code2("RU")
+                .language("Russian")
+                .build();
+
+        Content content = Content.builder()
+                .id(1L)
+                .name("Unknown Content")
+                .limit(limit)
+                .artist("Unknown Artist")
+                .user(user)
+                .createDate(LocalDate.now())
+                .language(language)
+                .build();
+
+        contentRepository.save(content);
+
         MediaType imageType = MediaType.builder()
                 .id(3L)
                 .type("IMAGE")
                 .build();
 
         ContentMediaId contentMediaId = ContentMediaId.builder()
-                .contentId(1L)
+                .content(content)
                 .mediaType(imageType)
                 .build();
 
@@ -80,7 +122,7 @@ public class ContentMediaRepositoryJpaTest {
                 .build();
 
         ContentMediaId videoContentMediaId = ContentMediaId.builder()
-                .contentId(2L)
+                .content(content)
                 .mediaType(videoType)
                 .build();
 
@@ -95,7 +137,7 @@ public class ContentMediaRepositoryJpaTest {
         contentMediaRepository.save(contentMedia);
 
         ContentMediaId primaryKey = ContentMediaId.builder()
-                .contentId(contentMedia.getContentMediaId().getContentId())
+                .content(contentMedia.getContentMediaId().getContent())
                 .mediaType(contentMedia.getContentMediaId().getMediaType())
                 .build();
 
@@ -105,8 +147,9 @@ public class ContentMediaRepositoryJpaTest {
 
         MediaType mediaType = contentMedia.getContentMediaId().getMediaType();
 
+        assertEqualsContent(contentMedia.getContentMediaId().getContent(), result.getContentMediaId().getContent());
+
         assertThat(result).isNotNull()
-                .matches(r -> r.getContentMediaId().getContentId().equals(contentMedia.getContentMediaId().getContentId()))
                 .matches(r -> r.getContentMediaId().getMediaType().getId().equals(contentMedia.getContentMediaId().getMediaType().getId()));
 
         assertThat(result.getContentMediaId().getMediaType()).isNotNull()
@@ -121,7 +164,7 @@ public class ContentMediaRepositoryJpaTest {
         contentMediaRepository.save(contentMedia);
 
         ContentMediaId primaryKey = ContentMediaId.builder()
-                .contentId(contentMedia.getContentMediaId().getContentId())
+                .content(contentMedia.getContentMediaId().getContent())
                 .mediaType(contentMedia.getContentMediaId().getMediaType())
                 .build();
 
@@ -131,8 +174,9 @@ public class ContentMediaRepositoryJpaTest {
 
         MediaType mediaType = contentMedia.getContentMediaId().getMediaType();
 
+        assertEqualsContent(contentMedia.getContentMediaId().getContent(), result.getContentMediaId().getContent());
+
         assertThat(result).isNotNull()
-                .matches(r -> r.getContentMediaId().getContentId().equals(contentMedia.getContentMediaId().getContentId()))
                 .matches(r -> r.getContentMediaId().getMediaType().getId().equals(contentMedia.getContentMediaId().getMediaType().getId()));
 
         assertThat(result.getContentMediaId().getMediaType()).isNotNull()
@@ -159,12 +203,14 @@ public class ContentMediaRepositoryJpaTest {
         ContentMedia contentMediaImage = resultImage.get(0);
         ContentMedia contentMediaVideo = resultVideo.get(0);
 
+        assertEqualsContent(contentMedia.getContentMediaId().getContent(), contentMediaImage.getContentMediaId().getContent());
+
         assertThat(resultImage).hasSize(1).isNotNull()
-                .allMatch(r -> r.getContentMediaId().getContentId().equals(contentMedia.getContentMediaId().getContentId()))
                 .allMatch(r -> r.getContentMediaId().getMediaType().getId().equals(contentMedia.getContentMediaId().getMediaType().getId()));
 
+        assertEqualsContent(contentMediaVideo.getContentMediaId().getContent(), contentMediaVideo.getContentMediaId().getContent());
+
         assertThat(resultVideo).hasSize(1).isNotNull()
-                .allMatch(r -> r.getContentMediaId().getContentId().equals(contentMediaVideo.getContentMediaId().getContentId()))
                 .allMatch(r -> r.getContentMediaId().getMediaType().getId().equals(contentMediaVideo.getContentMediaId().getMediaType().getId()));
 
         assertThat(contentMediaImage.getContentMediaId().getMediaType()).isNotNull()

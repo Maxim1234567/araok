@@ -4,19 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.araok.domain.ContentMediaId;
+import ru.araok.domain.ContentTypeId;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContentMediaIdDto {
+public class ContentTypeIdDto {
     private ContentDto content;
 
     private MediaTypeDto mediaType;
 
-    public static ContentMediaId toDomainObject(ContentMediaIdDto dto) {
-        return ContentMediaId.builder()
+    public static ContentTypeId toDomainObject(ContentTypeIdDto dto) {
+        return ContentTypeId.builder()
                 .content(
                         ContentDto.toDomainObject(dto.content)
                 )
@@ -26,13 +26,13 @@ public class ContentMediaIdDto {
                 .build();
     }
 
-    public static ContentMediaIdDto toDto(ContentMediaId contentMediaId) {
-        return ContentMediaIdDto.builder()
+    public static ContentTypeIdDto toDto(ContentTypeId contentTypeId) {
+        return ContentTypeIdDto.builder()
                 .content(
-                        ContentDto.toDto(contentMediaId.getContent())
+                        ContentDto.toDto(contentTypeId.getContent())
                 )
                 .mediaType(
-                        MediaTypeDto.toDto(contentMediaId.getMediaType())
+                        MediaTypeDto.toDto(contentTypeId.getMediaType())
                 )
                 .build();
     }

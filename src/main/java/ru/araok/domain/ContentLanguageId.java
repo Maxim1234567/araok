@@ -5,7 +5,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,13 +15,12 @@ import java.io.Serializable;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContentMediaId implements Serializable {
-
+public class ContentLanguageId implements Serializable {
     @OneToOne(orphanRemoval = true)
-    @JoinColumn(name = "CONTENT_ID", insertable = false, updatable = false)
+    @JoinColumn(name = "CONTENT_ID", updatable = false, insertable = false)
     private Content content;
 
     @OneToOne(orphanRemoval = true)
-    @JoinColumn(name = "TYPE_ID", insertable = false, updatable = false)
-    private MediaType mediaType;
+    @JoinColumn(name = "LANGUAGE_ID", updatable = false, insertable = false)
+    private Language language;
 }

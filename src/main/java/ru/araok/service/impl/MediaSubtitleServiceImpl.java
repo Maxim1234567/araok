@@ -14,6 +14,15 @@ public class MediaSubtitleServiceImpl implements MediaSubtitleService {
     private final MediaSubtitleRepository mediaSubtitleRepository;
 
     @Override
+    public MediaSubtitleDto save(MediaSubtitleDto mediaSubtitle) {
+        return MediaSubtitleDto.toDto(
+                mediaSubtitleRepository.save(
+                        MediaSubtitleDto.toDomainObject(mediaSubtitle)
+                )
+        );
+    }
+
+    @Override
     public MediaSubtitleDto findMediaSubtitleByContentIdAndLanguageId(long contentId, long languageId) {
         MediaSubtitle mediaSubtitle = mediaSubtitleRepository
                 .findByContentIdAndLanguageId(contentId, languageId)

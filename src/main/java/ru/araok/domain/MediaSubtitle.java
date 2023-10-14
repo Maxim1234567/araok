@@ -31,8 +31,9 @@ public class MediaSubtitle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "CONTENT_ID")
-    private Long contentId;
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "CONTENT_ID")
+    private Content content;
 
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "LANGUAGE_ID")

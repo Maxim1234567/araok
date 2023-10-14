@@ -5,24 +5,30 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.araok.domain.AgeLimit;
+import ru.araok.domain.Content;
 import ru.araok.domain.Language;
 import ru.araok.domain.MediaSubtitle;
 import ru.araok.domain.Subtitle;
+import ru.araok.domain.User;
 import ru.araok.dto.MediaSubtitleDto;
 import ru.araok.dto.SubtitleDto;
 import ru.araok.exception.NotFoundContentException;
 import ru.araok.repository.MediaSubtitleRepository;
 import ru.araok.service.impl.MediaSubtitleServiceImpl;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static ru.araok.Utils.assertEqualsContentDto;
 
 @ExtendWith(MockitoExtension.class)
 public class MediaSubtitleServiceTest {
@@ -59,15 +65,40 @@ public class MediaSubtitleServiceTest {
                 .from(4L)
                 .build();
 
+        AgeLimit limit = AgeLimit.builder()
+                .id(1L)
+                .description("for children under 6 years of age")
+                .limit(0L)
+                .build();
+
+        User user = User.builder()
+                .id(1L)
+                .name("Maxim")
+                .phone("89993338951")
+                .password("12345")
+                .birthDate(LocalDate.of(1994, 8, 5))
+                .role("USER")
+                .build();
+
         Language language = Language.builder()
                 .id(1L)
-                .language("Russian")
                 .code2("RU")
+                .language("Russian")
+                .build();
+
+        Content content = Content.builder()
+                .id(1L)
+                .name("Unknown Content")
+                .limit(limit)
+                .artist("Unknown Artist")
+                .user(user)
+                .createDate(LocalDate.now())
+                .language(language)
                 .build();
 
         mediaSubtitle = MediaSubtitle.builder()
                 .id(1L)
-                .contentId(1L)
+                .content(content)
                 .language(language)
                 .subtitles(
                         List.of(subtitle1, subtitle2, subtitle3)
@@ -78,17 +109,22 @@ public class MediaSubtitleServiceTest {
     @Test
     public void shouldCorrectReturnMediaSubtitleByContentIdAndLanguageId() {
         given(mediaSubtitleRepository.findByContentIdAndLanguageId(
-                eq(mediaSubtitle.getContentId()),
+                eq(mediaSubtitle.getContent().getId()),
                 eq(mediaSubtitle.getLanguage().getId()))
         ).willReturn(Optional.of(mediaSubtitle));
 
-        MediaSubtitleDto mediaSubtitleDto = mediaSubtitleService.findMediaSubtitleByContentIdAndLanguageId(mediaSubtitle.getContentId(), mediaSubtitle.getLanguage().getId());
+        MediaSubtitleDto mediaSubtitleDto = mediaSubtitleService.findMediaSubtitleByContentIdAndLanguageId(
+                mediaSubtitle.getContent().getId(), mediaSubtitle.getLanguage().getId()
+        );
 
-        verify(mediaSubtitleRepository, times(1)).findByContentIdAndLanguageId(eq(mediaSubtitle.getContentId()), eq(mediaSubtitle.getLanguage().getId()));
+        verify(mediaSubtitleRepository, times(1)).findByContentIdAndLanguageId(
+                eq(mediaSubtitle.getContent().getId()), eq(mediaSubtitle.getLanguage().getId())
+        );
 
         assertThat(mediaSubtitleDto).isNotNull()
-                .matches(ms -> ms.getId().equals(mediaSubtitle.getId()))
-                .matches(ms -> ms.getContentId().equals(mediaSubtitle.getContentId()));
+                .matches(ms -> ms.getId().equals(mediaSubtitle.getId()));
+
+        assertEqualsContentDto(mediaSubtitle.getContent(), mediaSubtitleDto.getContent());
 
         assertThat(mediaSubtitleDto.getLanguage()).isNotNull()
                 .matches(l -> l.getId().equals(mediaSubtitle.getLanguage().getId()))
@@ -101,11 +137,39 @@ public class MediaSubtitleServiceTest {
     @Test
     public void shouldDoesThrowNotFoundContentException() {
         given(mediaSubtitleRepository.findByContentIdAndLanguageId(
-                eq(mediaSubtitle.getContentId()),
+                eq(mediaSubtitle.getContent().getId()),
                 eq(mediaSubtitle.getLanguage().getId())
         )).willReturn(Optional.empty());
 
-        assertThrows(NotFoundContentException.class, () -> mediaSubtitleService.findMediaSubtitleByContentIdAndLanguageId(mediaSubtitle.getContentId(), mediaSubtitle.getLanguage().getId()));
+        assertThrows(NotFoundContentException.class,
+                () -> mediaSubtitleService.findMediaSubtitleByContentIdAndLanguageId(
+                        mediaSubtitle.getContent().getId(),
+                        mediaSubtitle.getLanguage().getId()
+                )
+        );
+    }
+
+    @Test
+    public void shouldCorrectSaveMediaSubtitle() {
+        given(mediaSubtitleRepository.save((any(MediaSubtitle.class))))
+                .willReturn(mediaSubtitle);
+
+        MediaSubtitleDto mediaSubtitleDto = MediaSubtitleDto.toDto(mediaSubtitle);
+        MediaSubtitleDto result = mediaSubtitleService.save(mediaSubtitleDto);
+
+        verify(mediaSubtitleRepository, times(1)).save(any(MediaSubtitle.class));
+
+        assertThat(result).isNotNull()
+                .matches(ms -> ms.getId().equals(mediaSubtitle.getId()));
+
+        assertEqualsContentDto(mediaSubtitle.getContent(), mediaSubtitleDto.getContent());
+
+        assertThat(result.getLanguage()).isNotNull()
+                .matches(l -> l.getId().equals(mediaSubtitle.getLanguage().getId()))
+                .matches(l -> l.getCode2().equals(mediaSubtitle.getLanguage().getCode2()))
+                .matches(l -> l.getLanguage().equals(mediaSubtitle.getLanguage().getLanguage()));
+
+        assertEqualsSubtitleList(mediaSubtitle.getSubtitles(), result.getSubtitles());
     }
 
     private void assertEqualsSubtitleList(List<Subtitle> excepted, List<SubtitleDto> result) {

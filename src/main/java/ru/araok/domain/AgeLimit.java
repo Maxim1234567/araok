@@ -12,28 +12,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Entity
-@Table(name = "USERS")
+@Table(name = "AGE_LIMIT")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class AgeLimit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String description;
 
-    private String phone;
-
-    private String password;
-
-    @Column(name = "birth_date")
-    private LocalDate birthDate;
-
-    private String role;
+    @Column(name = "LIMITS")
+    private Long limit;
 }

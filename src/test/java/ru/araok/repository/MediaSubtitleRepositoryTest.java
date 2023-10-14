@@ -5,10 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import ru.araok.domain.AgeLimit;
+import ru.araok.domain.Content;
 import ru.araok.domain.Language;
 import ru.araok.domain.MediaSubtitle;
 import ru.araok.domain.Subtitle;
+import ru.araok.domain.User;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,10 +21,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class MediaSubtitleRepositoryTest {
 
-    private static final Long CONTENT_ID = 1L;
+    private Long CONTENT_ID;
 
     @Autowired
     private MediaSubtitleRepository mediaSubtitleRepository;
+
+    @Autowired
+    private ContentRepository contentRepository;
 
     private MediaSubtitle ruSubtitle;
 
@@ -28,8 +35,42 @@ public class MediaSubtitleRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-//-------------------------------------ru----------------------------------------
+        AgeLimit limit = AgeLimit.builder()
+                .id(1L)
+                .description("for children under 6 years of age")
+                .limit(0L)
+                .build();
 
+        User user = User.builder()
+                .id(1L)
+                .name("Maxim")
+                .phone("89993338951")
+                .password("12345")
+                .birthDate(LocalDate.of(1994, 8, 5))
+                .role("USER")
+                .build();
+
+        Language language = Language.builder()
+                .id(1L)
+                .code2("RU")
+                .language("Russian")
+                .build();
+
+        Content content = Content.builder()
+                .id(1L)
+                .name("Unknown Content")
+                .limit(limit)
+                .artist("Unknown Artist")
+                .user(user)
+                .createDate(LocalDate.now())
+                .language(language)
+                .build();
+
+        contentRepository.save(content);
+
+        CONTENT_ID = content.getId();
+
+//-------------------------------------ru----------------------------------------
         Subtitle ruSubtitle1 = Subtitle.builder()
                 .line("line1")
                 .to(1L)
@@ -55,7 +96,7 @@ public class MediaSubtitleRepositoryTest {
                 .build();
 
         ruSubtitle = MediaSubtitle.builder()
-                .contentId(CONTENT_ID)
+                .content(content)
                 .language(ruLanguage)
                 .subtitles(
                         List.of(ruSubtitle1, ruSubtitle2, ruSubtitle3)
@@ -89,7 +130,7 @@ public class MediaSubtitleRepositoryTest {
                 .build();
 
         enSubtitle = MediaSubtitle.builder()
-                .contentId(CONTENT_ID)
+                .content(content)
                 .language(enLanguage)
                 .subtitles(
                         List.of(enSubtitle1, enSubtitle2, enSubtitle3)
@@ -121,6 +162,8 @@ public class MediaSubtitleRepositoryTest {
     public void shouldCorrectReturnMediaSubtitleByContentId() {
         mediaSubtitleRepository.save(ruSubtitle);
         mediaSubtitleRepository.save(enSubtitle);
+
+        List<MediaSubtitle> all = mediaSubtitleRepository.findAll();
 
         List<MediaSubtitle> mediaSubtitles = mediaSubtitleRepository.findByContentId(CONTENT_ID);
 
@@ -158,7 +201,7 @@ public class MediaSubtitleRepositoryTest {
         mediaSubtitleRepository.save(enSubtitle);
 
         MediaSubtitle result = mediaSubtitleRepository.findByContentIdAndLanguageId(
-                ruSubtitle.getContentId(), ruSubtitle.getLanguage().getId()
+                ruSubtitle.getContent().getId(), ruSubtitle.getLanguage().getId()
         ).get();
 
         assertThatMediaSubtitle(ruSubtitle, result);

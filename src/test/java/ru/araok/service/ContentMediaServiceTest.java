@@ -5,13 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.araok.domain.AgeLimit;
+import ru.araok.domain.Content;
 import ru.araok.domain.ContentMedia;
 import ru.araok.domain.ContentMediaId;
+import ru.araok.domain.Language;
 import ru.araok.domain.MediaType;
+import ru.araok.domain.User;
 import ru.araok.dto.ContentMediaDto;
 import ru.araok.dto.ContentMediaIdDto;
 import ru.araok.repository.ContentMediaRepository;
 import ru.araok.service.impl.ContentMediaServiceImpl;
+
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -20,6 +26,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static ru.araok.Utils.assertEqualsContent;
+import static ru.araok.Utils.assertEqualsContentDto;
 
 @ExtendWith(MockitoExtension.class)
 public class ContentMediaServiceTest {
@@ -49,6 +57,37 @@ public class ContentMediaServiceTest {
 
     @BeforeEach
     public void setUp() {
+        AgeLimit limit = AgeLimit.builder()
+                .id(1L)
+                .description("for children under 6 years of age")
+                .limit(0L)
+                .build();
+
+        User user = User.builder()
+                .id(1L)
+                .name("Maxim")
+                .phone("89993338951")
+                .password("12345")
+                .birthDate(LocalDate.of(1994, 8, 5))
+                .role("USER")
+                .build();
+
+        Language language = Language.builder()
+                .id(1L)
+                .code2("RU")
+                .language("Russian")
+                .build();
+
+        Content content = Content.builder()
+                .id(1L)
+                .name("Unknown Content")
+                .limit(limit)
+                .artist("Unknown Artist")
+                .user(user)
+                .createDate(LocalDate.now())
+                .language(language)
+                .build();
+
         contentMediaService = new ContentMediaServiceImpl(contentMediaRepository);
 
         MediaType mediaType = MediaType.builder()
@@ -57,7 +96,7 @@ public class ContentMediaServiceTest {
                 .build();
 
         ContentMediaId contentMediaId = ContentMediaId.builder()
-                .contentId(1L)
+                .content(content)
                 .mediaType(mediaType)
                 .build();
 
@@ -128,8 +167,7 @@ public class ContentMediaServiceTest {
                 .matches(m -> m.getId().equals(mediaType.getId()))
                 .matches(m -> m.getType().equals(mediaType.getType()));
 
-        assertThat(result.getContentMediaId()).isNotNull()
-                .matches(cm -> cm.getContentId().equals(contentMediaId.getContentId()));
+        assertEqualsContentDto(contentMediaId.getContent(), result.getContentMediaId().getContent());
 
         assertArrayEquals(result.getMedia(), contentMedia.getMedia());
     }
