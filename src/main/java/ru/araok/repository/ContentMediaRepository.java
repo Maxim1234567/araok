@@ -7,9 +7,10 @@ import ru.araok.domain.ContentMedia;
 import ru.araok.domain.ContentMediaId;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ContentMediaRepository extends JpaRepository<ContentMedia, ContentMedia> {
-    ContentMedia findByContentMediaId(ContentMediaId contentMediaId);
+    Optional<ContentMedia> findByContentMediaId(ContentMediaId contentMediaId);
 
     @Query("select cm from ContentMedia cm where cm.contentMediaId.mediaType.id = :typeId")
     List<ContentMedia> findByTypeId(@Param("typeId") Long typeId);

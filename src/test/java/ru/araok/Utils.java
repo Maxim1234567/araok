@@ -22,13 +22,7 @@ public class Utils {
                 .matches(l -> l.getDescription().equals(excepted.getLimit().getDescription()))
                 .matches(l -> l.getLimit().equals(excepted.getLimit().getLimit()));
 
-        assertThat(user).isNotNull()
-                .matches(u -> u.getId().equals(excepted.getUser().getId()))
-                .matches(u -> u.getName().equals(excepted.getUser().getName()))
-                .matches(u -> u.getPhone().equals(excepted.getUser().getPhone()))
-                .matches(u -> u.getPassword().equals(excepted.getUser().getPassword()))
-                .matches(u -> u.getBirthDate().equals(excepted.getUser().getBirthDate()))
-                .matches(u -> u.getRole().equals(excepted.getUser().getRole()));
+        assertEqualsUser(excepted.getUser(), user);
 
         assertThat(language).isNotNull()
                 .matches(l -> l.getId().equals(excepted.getLanguage().getId()))
@@ -42,6 +36,16 @@ public class Utils {
                 .matches(c -> c.getCreateDate().equals(excepted.getCreateDate()));
     }
 
+    public static void assertEqualsUser(User excepted, User result) {
+        assertThat(result).isNotNull()
+                .matches(u -> u.getId().equals(excepted.getId()))
+                .matches(u -> u.getName().equals(excepted.getName()))
+                .matches(u -> u.getPhone().equals(excepted.getPhone()))
+                .matches(u -> u.getPassword().equals(excepted.getPassword()))
+                .matches(u -> u.getBirthDate().equals(excepted.getBirthDate()))
+                .matches(u -> u.getRole().equals(excepted.getRole()));
+    }
+
     public static void assertEqualsContentDto(Content excepted, ContentDto result) {
         AgeLimitDto limit = result.getLimit();
         UserDto user = result.getUser();
@@ -52,13 +56,7 @@ public class Utils {
                 .matches(l -> l.getDescription().equals(excepted.getLimit().getDescription()))
                 .matches(l -> l.getLimit().equals(excepted.getLimit().getLimit()));
 
-        assertThat(user).isNotNull()
-                .matches(u -> u.getId().equals(excepted.getUser().getId()))
-                .matches(u -> u.getName().equals(excepted.getUser().getName()))
-                .matches(u -> u.getPhone().equals(excepted.getUser().getPhone()))
-                .matches(u -> u.getPassword().equals(excepted.getUser().getPassword()))
-                .matches(u -> u.getBirthDate().equals(excepted.getUser().getBirthDate()))
-                .matches(u -> u.getRole().equals(excepted.getUser().getRole()));
+        assertEqualsUserDto(excepted.getUser(), user);
 
         assertThat(language).isNotNull()
                 .matches(l -> l.getId().equals(excepted.getLanguage().getId()))
@@ -70,5 +68,15 @@ public class Utils {
                 .matches(c -> c.getArtist().equals(excepted.getArtist()))
                 .matches(c -> c.getName().equals(excepted.getName()))
                 .matches(c -> c.getCreateDate().equals(excepted.getCreateDate()));
+    }
+
+    public static void assertEqualsUserDto(User excepted, UserDto result) {
+        assertThat(result).isNotNull()
+                .matches(u -> u.getId().equals(excepted.getId()))
+                .matches(u -> u.getName().equals(excepted.getName()))
+                .matches(u -> u.getPhone().equals(excepted.getPhone()))
+                .matches(u -> u.getPassword().equals(excepted.getPassword()))
+                .matches(u -> u.getBirthDate().equals(excepted.getBirthDate()))
+                .matches(u -> u.getRole().equals(excepted.getRole()));
     }
 }

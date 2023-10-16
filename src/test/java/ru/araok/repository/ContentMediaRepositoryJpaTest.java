@@ -143,7 +143,7 @@ public class ContentMediaRepositoryJpaTest {
 
         ContentMedia result = contentMediaRepository.findByContentMediaId(
                 primaryKey
-        );
+        ).orElseThrow();
 
         MediaType mediaType = contentMedia.getContentMediaId().getMediaType();
 
@@ -170,7 +170,7 @@ public class ContentMediaRepositoryJpaTest {
 
         ContentMedia result = contentMediaRepository.findByContentMediaId(
                 primaryKey
-        );
+        ).orElseThrow();
 
         MediaType mediaType = contentMedia.getContentMediaId().getMediaType();
 

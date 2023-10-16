@@ -14,19 +14,20 @@ import ru.araok.domain.MediaType;
 import ru.araok.domain.User;
 import ru.araok.dto.ContentMediaDto;
 import ru.araok.dto.ContentMediaIdDto;
+import ru.araok.exception.NotFoundContentException;
 import ru.araok.repository.ContentMediaRepository;
 import ru.araok.service.impl.ContentMediaServiceImpl;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static ru.araok.Utils.assertEqualsContent;
 import static ru.araok.Utils.assertEqualsContentDto;
 
 @ExtendWith(MockitoExtension.class)
@@ -113,7 +114,7 @@ public class ContentMediaServiceTest {
         );
 
         given(contentMediaRepository.findByContentMediaId(any(ContentMediaId.class)))
-                .willReturn(contentMedia);
+                .willReturn(Optional.of(contentMedia));
 
         ContentMediaDto result = contentMediaService.findContentMediaById(contentMediaIdDto);
 
@@ -121,6 +122,25 @@ public class ContentMediaServiceTest {
                 .findByContentMediaId(any(ContentMediaId.class));
 
         assertEqualsContentMedia(result);
+    }
+
+    @Test
+    public void shouldDoesThrowNotFoundContentExceptionCallFindByContentMediaId() {
+        ContentMediaIdDto contentMediaIdDto = ContentMediaIdDto.toDto(
+                contentMedia.getContentMediaId()
+        );
+
+        given(contentMediaRepository.findByContentMediaId(any(ContentMediaId.class)))
+                .willReturn(Optional.empty());
+
+        assertThrows(NotFoundContentException.class,
+                () -> contentMediaService.findContentMediaById(
+                        contentMediaIdDto
+                )
+        );
+
+        verify(contentMediaRepository, times(1))
+                .findByContentMediaId(any(ContentMediaId.class));
     }
 
     @Test

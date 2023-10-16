@@ -40,7 +40,7 @@ public class Content {
     @JoinColumn(name = "USER_ID")
     private User user;
 
-    @Column(name = "CREATE_DATE")
+    @Column(name = "CREATE_DATE", updatable = false)
     private LocalDate createDate;
 
     @OneToOne(orphanRemoval = true)
