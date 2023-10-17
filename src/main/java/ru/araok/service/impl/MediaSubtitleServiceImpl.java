@@ -24,12 +24,9 @@ public class MediaSubtitleServiceImpl implements MediaSubtitleService {
 
     @Override
     public MediaSubtitleDto findMediaSubtitleByContentIdAndLanguageId(long contentId, long languageId) {
-        MediaSubtitle mediaSubtitle = mediaSubtitleRepository
+        return mediaSubtitleRepository
                 .findByContentIdAndLanguageId(contentId, languageId)
+                .map(MediaSubtitleDto::toDto)
                 .orElseThrow(NotFoundContentException::new);
-
-        return MediaSubtitleDto.toDto(
-                mediaSubtitle
-        );
     }
 }

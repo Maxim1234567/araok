@@ -1,5 +1,6 @@
 package ru.araok.service;
 
+import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,9 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.araok.domain.AgeLimit;
 import ru.araok.domain.Content;
 import ru.araok.domain.ContentCounter;
+import ru.araok.domain.ContentRecommended;
 import ru.araok.domain.Language;
 import ru.araok.domain.User;
 import ru.araok.dto.ContentDto;
+import ru.araok.exception.NotFoundContentException;
 import ru.araok.property.ApplicationProperties;
 import ru.araok.repository.ContentCounterRepository;
 import ru.araok.repository.ContentRecommendedRepository;
@@ -19,9 +22,15 @@ import ru.araok.service.impl.ContentServiceImpl;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static ru.araok.Utils.assertEqualsContentDto;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,6 +51,18 @@ public class ContentServiceTest {
     private Content content2;
 
     private Content content3;
+
+    private ContentCounter contentCounter1;
+
+    private ContentCounter contentCounter2;
+
+    private ContentCounter contentCounter3;
+
+    private ContentRecommended contentRecommended1;
+
+    private ContentRecommended contentRecommended2;
+
+    private ContentRecommended contentRecommended3;
 
     @BeforeEach
     public void setUp() {
@@ -126,6 +147,42 @@ public class ContentServiceTest {
                 .createDate(LocalDate.now().plusDays(12))
                 .language(language3)
                 .build();
+
+        contentCounter1 = ContentCounter.builder()
+                .id(1L)
+                .content(content1)
+                .user(user)
+                .count(1001L)
+                .build();
+
+        contentCounter2 = ContentCounter.builder()
+                .id(2L)
+                .content(content2)
+                .user(user)
+                .count(1001L)
+                .build();
+
+        contentCounter3 = ContentCounter.builder()
+                .id(3L)
+                .content(content3)
+                .user(user)
+                .count(1001L)
+                .build();
+
+        contentRecommended1 = ContentRecommended.builder()
+                .id(1L)
+                .content(content1)
+                .build();
+
+        contentRecommended2 = ContentRecommended.builder()
+                .id(2L)
+                .content(content2)
+                .build();
+
+        contentRecommended3 = ContentRecommended.builder()
+                .id(3L)
+                .content(content3)
+                .build();
     }
 
     @Test
@@ -138,6 +195,8 @@ public class ContentServiceTest {
                 .willReturn(contents);
 
         List<ContentDto> results = contentService.getAll();
+
+        verify(contentRepository, times(1)).findAll();
 
         assertThat(results).isNotNull()
                 .hasSize(contents.size());
@@ -158,11 +217,112 @@ public class ContentServiceTest {
 
         List<ContentDto> results = contentService.getNewContents();
 
+        verify(contentRepository, times(1)).findByCreateDateLessThanNow();
+
         assertThat(results).isNotNull()
                 .hasSize(contents.size());
 
         for(int i = 0; i < contents.size(); i++) {
             assertEqualsContentDto(contents.get(i), results.get(i));
+        }
+    }
+
+    @Test
+    public void shouldCorrectReturnPopularContents() {
+        List<ContentCounter> contentCounters = List.of(
+                contentCounter1, contentCounter2, contentCounter3
+        );
+
+        given(contentCounterRepository.findByCountGreaterThan(eq(1000L)))
+                .willReturn(contentCounters);
+
+        List<ContentDto> results = contentService.getPopularContents();
+
+        verify(contentCounterRepository, times(1)).findByCountGreaterThan(eq(1000L));
+
+        assertThat(results).isNotNull()
+                .hasSize(contentCounters.size());
+
+        for(int i = 0; i < contentCounters.size(); i++) {
+            assertEqualsContentDto(contentCounters.get(i).getContent(), results.get(i));
+        }
+    }
+
+    @Test
+    public void shouldCorrectReturnContentFindByName() {
+        List<Content> contents = List.of(
+                content1, content2, content3
+        );
+
+        given(contentRepository.findByNameContainingIgnoreCase(eq("unknown")))
+                .willReturn(contents);
+
+        List<ContentDto> results = contentService.findContentsByName("unknown");
+
+        verify(contentRepository, times(1)).findByNameContainingIgnoreCase(eq("unknown"));
+
+        assertThat(results).isNotNull()
+                .hasSize(contents.size());
+
+        for(int i = 0; i < contents.size(); i++) {
+            assertEqualsContentDto(contents.get(i), results.get(i));
+        }
+    }
+
+    @Test
+    public void shouldCorrectReturnContentById() {
+        given(contentRepository.findById(eq(content1.getId())))
+                .willReturn(Optional.of(content1));
+
+        ContentDto result = contentService.findContentById(content1.getId());
+
+        verify(contentRepository, times(1)).findById(eq(content1.getId()));
+
+        assertEqualsContentDto(content1, result);
+    }
+
+    @Test
+    public void shouldDoesThrowsNotFoundContentExceptionFindContentById() {
+        given(contentRepository.findById(eq(content1.getId())))
+                .willReturn(Optional.empty());
+
+        assertThrows(NotFoundContentException.class, () -> contentService.findContentById(content1.getId()));
+
+        verify(contentRepository, times(1)).findById(eq(content1.getId()));
+    }
+
+    @Test
+    public void shouldCorrectSaveContent() {
+        given(contentRepository.save(any(Content.class)))
+                .willReturn(content1);
+
+        ContentDto result = contentService.save(
+                ContentDto.toDto(content1)
+        );
+
+        verify(contentRepository, times(1)).save(any(Content.class));
+
+        assertEqualsContentDto(content1, result);
+    }
+
+    @Test
+    public void shouldCorrectReturnContentRecommended() {
+        List<ContentRecommended> contentRecommends = List.of(
+                contentRecommended1, contentRecommended2, contentRecommended3
+        );
+
+        given(contentRecommendedRepository.findAll())
+                .willReturn(contentRecommends);
+
+        List<ContentDto> results = contentService.getRecommendedContents();
+
+        verify(contentRecommendedRepository, times(1)).findAll();
+
+        assertThat(results).isNotNull()
+                .hasSize(contentRecommends.size());
+
+        for(int i = 0; i < contentRecommends.size(); i++) {
+            assertEqualsContentDto(contentRecommends.get(i).getContent(), results.get(i));
         }
     }
 }
