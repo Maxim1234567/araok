@@ -26,7 +26,7 @@ public class MediaSubtitleController {
         );
     }
 
-    @PostMapping("/api/subtitle}")
+    @PostMapping("/api/subtitle")
     public ResponseEntity<MediaSubtitleDto> save(@RequestBody MediaSubtitleDto mediaSubtitle) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 mediaSubtitleService.save(mediaSubtitle)

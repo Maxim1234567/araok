@@ -9,15 +9,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.araok.domain.AgeLimit;
 import ru.araok.domain.Content;
 import ru.araok.domain.ContentCounter;
+import ru.araok.domain.ContentMedia;
+import ru.araok.domain.ContentMediaId;
 import ru.araok.domain.ContentRecommended;
 import ru.araok.domain.Language;
+import ru.araok.domain.MediaSubtitle;
+import ru.araok.domain.MediaType;
+import ru.araok.domain.Subtitle;
 import ru.araok.domain.User;
 import ru.araok.dto.ContentDto;
+import ru.araok.dto.ContentMediaDto;
+import ru.araok.dto.ContentWithContentMediaAndMediaSubtitleDto;
+import ru.araok.dto.MediaSubtitleDto;
 import ru.araok.exception.NotFoundContentException;
 import ru.araok.property.ApplicationProperties;
 import ru.araok.repository.ContentCounterRepository;
+import ru.araok.repository.ContentMediaRepository;
 import ru.araok.repository.ContentRecommendedRepository;
 import ru.araok.repository.ContentRepository;
+import ru.araok.repository.MediaSubtitleRepository;
 import ru.araok.service.impl.ContentServiceImpl;
 
 import java.time.LocalDate;
@@ -37,6 +47,12 @@ import static ru.araok.Utils.assertEqualsContentDto;
 public class ContentServiceTest {
     @Mock
     private ContentRepository contentRepository;
+
+    @Mock
+    private ContentMediaRepository contentMediaRepository;
+
+    @Mock
+    private MediaSubtitleRepository mediaSubtitleRepository;
 
     @Mock
     private ContentCounterRepository contentCounterRepository;
@@ -64,11 +80,35 @@ public class ContentServiceTest {
 
     private ContentRecommended contentRecommended3;
 
+    private ContentMedia contentMedia;
+
+    private MediaSubtitle mediaSubtitle;
+
+    private ContentWithContentMediaAndMediaSubtitleDto saveContent;
+
+    private byte[] video = {
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+            1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1
+    };
+
     @BeforeEach
     public void setUp() {
         contentService = new ContentServiceImpl(
                 new ApplicationProperties(1000L),
                 contentRepository,
+                contentMediaRepository,
+                mediaSubtitleRepository,
                 contentCounterRepository,
                 contentRecommendedRepository
         );
@@ -182,6 +222,58 @@ public class ContentServiceTest {
         contentRecommended3 = ContentRecommended.builder()
                 .id(3L)
                 .content(content3)
+                .build();
+
+        MediaType mediaType = MediaType.builder()
+                .id(1L)
+                .type("VIDEO")
+                .build();
+
+        ContentMediaId contentMediaId = ContentMediaId.builder()
+                .content(content1)
+                .mediaType(mediaType)
+                .build();
+
+        Subtitle subtitle1 = Subtitle.builder()
+                .id(1L)
+                .line("line1")
+                .to(1L)
+                .from(2L)
+                .build();
+
+        Subtitle subtitle2 = Subtitle.builder()
+                .id(2L)
+                .line("line2")
+                .to(2L)
+                .from(3L)
+                .build();
+
+        Subtitle subtitle3 = Subtitle.builder()
+                .id(3L)
+                .line("line3")
+                .to(3L)
+                .from(4L)
+                .build();
+
+        mediaSubtitle = MediaSubtitle.builder()
+                .id(1L)
+                .content(content1)
+                .language(language1)
+                .subtitles(
+                        List.of(subtitle1, subtitle2, subtitle3)
+                )
+                .build();
+
+        contentMedia = ContentMedia.builder()
+                .contentMediaId(contentMediaId)
+                .media(video)
+                .build();
+
+        saveContent = ContentWithContentMediaAndMediaSubtitleDto.builder()
+                .content(ContentDto.toDto(content1))
+                .preview(ContentMediaDto.toDto(contentMedia))
+                .video(ContentMediaDto.toDto(contentMedia))
+                .mediaSubtitle(MediaSubtitleDto.toDto(mediaSubtitle))
                 .build();
     }
 
@@ -297,10 +389,12 @@ public class ContentServiceTest {
                 .willReturn(content1);
 
         ContentDto result = contentService.save(
-                ContentDto.toDto(content1)
+                saveContent
         );
 
         verify(contentRepository, times(1)).save(any(Content.class));
+        verify(contentMediaRepository, times(2)).save(any(ContentMedia.class));
+        verify(mediaSubtitleRepository, times(1)).save(any(MediaSubtitle.class));
 
         assertEqualsContentDto(content1, result);
     }

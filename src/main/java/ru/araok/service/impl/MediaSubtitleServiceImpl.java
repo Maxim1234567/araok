@@ -2,7 +2,7 @@ package ru.araok.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.araok.domain.MediaSubtitle;
+import org.springframework.transaction.annotation.Transactional;
 import ru.araok.dto.MediaSubtitleDto;
 import ru.araok.exception.NotFoundContentException;
 import ru.araok.repository.MediaSubtitleRepository;
@@ -14,6 +14,7 @@ public class MediaSubtitleServiceImpl implements MediaSubtitleService {
     private final MediaSubtitleRepository mediaSubtitleRepository;
 
     @Override
+    @Transactional
     public MediaSubtitleDto save(MediaSubtitleDto mediaSubtitle) {
         return MediaSubtitleDto.toDto(
                 mediaSubtitleRepository.save(
@@ -23,6 +24,7 @@ public class MediaSubtitleServiceImpl implements MediaSubtitleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MediaSubtitleDto findMediaSubtitleByContentIdAndLanguageId(long contentId, long languageId) {
         return mediaSubtitleRepository
                 .findByContentIdAndLanguageId(contentId, languageId)

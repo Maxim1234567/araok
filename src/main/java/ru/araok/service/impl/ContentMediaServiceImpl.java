@@ -2,6 +2,7 @@ package ru.araok.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.araok.domain.ContentMedia;
 import ru.araok.domain.ContentMediaId;
 import ru.araok.dto.ContentMediaDto;
@@ -17,6 +18,7 @@ public class ContentMediaServiceImpl implements ContentMediaService {
     private final ContentMediaRepository contentMediaRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public ContentMediaDto findContentMediaById(ContentMediaIdDto contentMediaIdDto) {
         ContentMediaId contentMediaId = ContentMediaIdDto.toDomainObject(contentMediaIdDto);
 
@@ -27,6 +29,7 @@ public class ContentMediaServiceImpl implements ContentMediaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public byte[] findMediaByContentMediaId(ContentMediaIdDto contentMediaId) {
         return contentMediaRepository.findMediaByContentMediaId(
                 ContentMediaIdDto.toDomainObject(contentMediaId)
@@ -34,6 +37,7 @@ public class ContentMediaServiceImpl implements ContentMediaService {
     }
 
     @Override
+    @Transactional
     public ContentMediaDto save(ContentMediaDto contentMediaDto) {
         ContentMedia contentMedia = ContentMediaDto.toDomainObject(contentMediaDto);
 

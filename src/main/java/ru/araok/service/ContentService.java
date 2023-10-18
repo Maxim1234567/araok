@@ -1,6 +1,7 @@
 package ru.araok.service;
 
 import ru.araok.dto.ContentDto;
+import ru.araok.dto.ContentWithContentMediaAndMediaSubtitleDto;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface ContentService {
 
     ContentDto findContentById(Long id);
 
-    ContentDto save(ContentDto content);
+    ContentDto save(ContentWithContentMediaAndMediaSubtitleDto content);
 
     List<ContentDto> getRecommendedContents();
 }
