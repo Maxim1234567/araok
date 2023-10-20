@@ -1,6 +1,5 @@
 package ru.araok.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,10 +14,7 @@ import ru.araok.dto.ContentMediaIdDto;
 import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MediaTypeDto;
 import ru.araok.dto.UserDto;
-import ru.araok.service.ContentMediaService;
-import ru.araok.service.ContentService;
 import ru.araok.service.MediaService;
-import ru.araok.service.MediaTypeService;
 
 import java.time.LocalDate;
 
@@ -132,7 +128,7 @@ public class MediaControllerTest {
                 .limit(limit)
                 .artist("Unknown Artist")
                 .user(user)
-                .createDate(LocalDate.now())
+                .createDate(LocalDate.of(2023, 10, 18))
                 .language(language)
                 .build();
 

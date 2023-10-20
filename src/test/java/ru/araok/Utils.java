@@ -1,5 +1,6 @@
 package ru.araok;
 
+import org.junit.jupiter.api.Test;
 import ru.araok.domain.AgeLimit;
 import ru.araok.domain.Content;
 import ru.araok.domain.Language;
@@ -8,6 +9,11 @@ import ru.araok.dto.AgeLimitDto;
 import ru.araok.dto.ContentDto;
 import ru.araok.dto.LanguageDto;
 import ru.araok.dto.UserDto;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -78,5 +84,13 @@ public class Utils {
                 .matches(u -> u.getPassword().equals(excepted.getPassword()))
                 .matches(u -> u.getBirthDate().equals(excepted.getBirthDate()))
                 .matches(u -> u.getRole().equals(excepted.getRole()));
+    }
+
+    @Test
+    public void test() throws IOException {
+        File file = new File("C:\\Users\\user\\Pictures\\Screenshots\\screen1.png");
+        byte[] bytes = Files.readAllBytes(file.toPath());
+
+        System.out.println(Arrays.toString(bytes));
     }
 }

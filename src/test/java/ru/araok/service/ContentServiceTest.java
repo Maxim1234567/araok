@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.araok.constant.TypeContent;
 import ru.araok.domain.AgeLimit;
 import ru.araok.domain.Content;
 import ru.araok.domain.ContentCounter;
@@ -286,7 +287,7 @@ public class ContentServiceTest {
         given(contentRepository.findAll())
                 .willReturn(contents);
 
-        List<ContentDto> results = contentService.getAll();
+        List<ContentDto> results = contentService.findContentsByType(TypeContent.ALL);
 
         verify(contentRepository, times(1)).findAll();
 
@@ -307,7 +308,7 @@ public class ContentServiceTest {
         given(contentRepository.findByCreateDateLessThanNow())
                 .willReturn(contents);
 
-        List<ContentDto> results = contentService.getNewContents();
+        List<ContentDto> results = contentService.findContentsByType(TypeContent.NEW);
 
         verify(contentRepository, times(1)).findByCreateDateLessThanNow();
 
@@ -328,7 +329,7 @@ public class ContentServiceTest {
         given(contentCounterRepository.findByCountGreaterThan(eq(1000L)))
                 .willReturn(contentCounters);
 
-        List<ContentDto> results = contentService.getPopularContents();
+        List<ContentDto> results = contentService.findContentsByType(TypeContent.POPULAR);
 
         verify(contentCounterRepository, times(1)).findByCountGreaterThan(eq(1000L));
 
@@ -408,7 +409,7 @@ public class ContentServiceTest {
         given(contentRecommendedRepository.findAll())
                 .willReturn(contentRecommends);
 
-        List<ContentDto> results = contentService.getRecommendedContents();
+        List<ContentDto> results = contentService.findContentsByType(TypeContent.RECOMMENDED);
 
         verify(contentRecommendedRepository, times(1)).findAll();
 

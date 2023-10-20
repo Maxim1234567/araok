@@ -2,7 +2,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/araok-test
+    url: jdbc:postgresql://localhost:5433/araok-test
     username: araok
     password: araok
     driver-class-name: org.postgresql.Driver

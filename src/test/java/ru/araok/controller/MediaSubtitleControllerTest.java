@@ -128,7 +128,7 @@ public class MediaSubtitleControllerTest {
                 .limit(limit)
                 .artist("Unknown Artist")
                 .user(user)
-                .createDate(LocalDate.now())
+                .createDate(LocalDate.of(2023, 10, 18))
                 .language(language)
                 .build();
 

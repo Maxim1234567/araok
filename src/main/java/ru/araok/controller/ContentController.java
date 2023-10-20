@@ -1,6 +1,7 @@
 package ru.araok.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +14,6 @@ import ru.araok.dto.ContentDto;
 import ru.araok.dto.ContentWithContentMediaAndMediaSubtitleDto;
 import ru.araok.service.ContentService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,19 +23,9 @@ public class ContentController {
 
     @GetMapping("/api/content")
     public ResponseEntity<List<ContentDto>> getContents(@RequestParam("type") TypeContent type) {
-        List<ContentDto> contents = new ArrayList<>();
-
-        if(type == TypeContent.ALL) {
-            contents = contentService.getAll();
-        } else if(type == TypeContent.NEW) {
-            contents = contentService.getNewContents();
-        } else if(type == TypeContent.POPULAR) {
-            contents = contentService.getPopularContents();
-        } else if(type == TypeContent.RECOMMENDED) {
-            contents = contentService.getRecommendedContents();
-        }
-
-        return ResponseEntity.ok(contents);
+        return ResponseEntity.ok(
+                contentService.findContentsByType(type)
+        );
     }
 
     @GetMapping("/api/content/{name}")
@@ -43,7 +33,7 @@ public class ContentController {
         return ResponseEntity.ok(contentService.findContentsByName(name));
     }
 
-    @GetMapping("/api/content/{id}")
+    @GetMapping("/api/content/id/{id}")
     public ResponseEntity<ContentDto> getContentById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(
                 contentService.findContentById(id)
@@ -53,6 +43,6 @@ public class ContentController {
     @PostMapping("/api/content")
     public ResponseEntity<String> save(@RequestBody ContentWithContentMediaAndMediaSubtitleDto content) {
         contentService.save(content);
-        return ResponseEntity.ok("OK");
+        return ResponseEntity.status(HttpStatus.CREATED).body("OK");
     }
 }

@@ -3,6 +3,7 @@ package ru.araok.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.araok.constant.TypeContent;
 import ru.araok.domain.Content;
 import ru.araok.domain.ContentMedia;
 import ru.araok.domain.MediaSubtitle;
@@ -19,6 +20,7 @@ import ru.araok.repository.MediaSubtitleRepository;
 import ru.araok.service.ContentService;
 import ru.araok.service.PropertyProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -39,25 +41,43 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ContentDto> getAll() {
+    public List<ContentDto> findContentsByType(TypeContent type) {
+        List<ContentDto> contents = new ArrayList<>();
+
+        if(type == TypeContent.ALL) {
+            contents = getAll();
+        } else if(type == TypeContent.NEW) {
+            contents = getNewContents();
+        } else if(type == TypeContent.POPULAR) {
+            contents = getPopularContents();
+        } else if(type == TypeContent.RECOMMENDED) {
+            contents = getRecommendedContents();
+        }
+
+        return contents;
+    }
+
+    private List<ContentDto> getAll() {
         return contentRepository.findAll().stream()
                 .map(ContentDto::toDto)
                 .toList();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ContentDto> getNewContents() {
+    private List<ContentDto> getNewContents() {
         return contentRepository.findByCreateDateLessThanNow().stream()
                 .map(ContentDto::toDto)
                 .toList();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ContentDto> getPopularContents() {
+    private List<ContentDto> getPopularContents() {
         return contentCounterRepository.findByCountGreaterThan(propertyProvider.getCountContentDownloads()).stream()
                 .map(contentCounter -> ContentDto.toDto(contentCounter.getContent()))
+                .toList();
+    }
+
+    private List<ContentDto> getRecommendedContents() {
+        return contentRecommendedRepository.findAll().stream()
+                .map(contentRecommended -> ContentDto.toDto(contentRecommended.getContent()))
                 .toList();
     }
 
@@ -98,13 +118,5 @@ public class ContentServiceImpl implements ContentService {
         return ContentDto.toDto(
                 newContent
         );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ContentDto> getRecommendedContents() {
-        return contentRecommendedRepository.findAll().stream()
-                .map(contentRecommended -> ContentDto.toDto(contentRecommended.getContent()))
-                .toList();
     }
 }
