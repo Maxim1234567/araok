@@ -11,7 +11,9 @@ import ru.araok.dto.LanguageDto;
 import ru.araok.dto.UserDto;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.Arrays;
 
@@ -88,9 +90,12 @@ public class Utils {
 
     @Test
     public void test() throws IOException {
-        File file = new File("C:\\Users\\user\\Pictures\\Screenshots\\screen1.png");
+        File file = new File("C:\\Users\\user\\Downloads\\videoplayback.mp4");
         byte[] bytes = Files.readAllBytes(file.toPath());
 
-        System.out.println(Arrays.toString(bytes));
+        try (PrintWriter fos = new PrintWriter("C:\\Users\\user\\Downloads\\videoplayback.txt")) {
+            for(byte b: bytes)
+                fos.write(b + ", ");
+        }
     }
 }
