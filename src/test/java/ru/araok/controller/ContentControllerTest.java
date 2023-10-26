@@ -112,7 +112,7 @@ public class ContentControllerTest {
                     "            \"birthDate\": \"1994-08-05\",\n" +
                     "            \"role\": \"USER\"\n" +
                     "        },\n" +
-                    "        \"createDate\": \"2023-10-27\",\n" +
+                    "        \"createDate\": \"2023-10-19\",\n" +
                     "        \"language\": {\n" +
                     "            \"id\": 2,\n" +
                     "            \"language\": \"English\",\n" +
@@ -136,7 +136,7 @@ public class ContentControllerTest {
                     "            \"birthDate\": \"1994-08-05\",\n" +
                     "            \"role\": \"USER\"\n" +
                     "        },\n" +
-                    "        \"createDate\": \"2023-10-31\",\n" +
+                    "        \"createDate\": \"2023-10-19\",\n" +
                     "        \"language\": {\n" +
                     "            \"id\": 3,\n" +
                     "            \"language\": \"German\",\n" +
@@ -371,7 +371,7 @@ public class ContentControllerTest {
                 .limit(limit1)
                 .artist("Unknown Artist")
                 .user(user)
-                .createDate(LocalDate.now())
+                .createDate(LocalDate.of(2023, 10, 19))
                 .language(language1)
                 .build();
 
@@ -381,7 +381,7 @@ public class ContentControllerTest {
                 .limit(limit2)
                 .artist("Unknown Artist 2")
                 .user(user)
-                .createDate(LocalDate.now().plusDays(8))
+                .createDate(LocalDate.of(2023, 10, 19))
                 .language(language2)
                 .build();
 
@@ -391,7 +391,7 @@ public class ContentControllerTest {
                 .limit(limit3)
                 .artist("Unknown Artist 3")
                 .user(user)
-                .createDate(LocalDate.now().plusDays(12))
+                .createDate(LocalDate.of(2023, 10, 19))
                 .language(language3)
                 .build();
 

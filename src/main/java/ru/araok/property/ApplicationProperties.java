@@ -7,13 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import ru.araok.service.PropertyProvider;
 
 @Getter
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 @ConfigurationProperties(prefix = "app")
 public class ApplicationProperties implements PropertyProvider {
     private final long countContentDownloads;
-
-    public ApplicationProperties(long countContentDownloads) {
-        System.out.println("countContentDownloads: " + countContentDownloads);
-        this.countContentDownloads = countContentDownloads;
-    }
 }
