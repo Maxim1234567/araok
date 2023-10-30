@@ -3,6 +3,7 @@ package ru.araok.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ContentController {
     private final ContentService contentService;
 
+    @PreAuthorize("hasAnyAuthority('USER')")
     @GetMapping("/api/content")
     public ResponseEntity<List<ContentDto>> getContents(@RequestParam("type") TypeContent type) {
         return ResponseEntity.ok(
@@ -33,6 +35,7 @@ public class ContentController {
         return ResponseEntity.ok(contentService.findContentsByName(name));
     }
 
+    @PreAuthorize("hasAnyAuthority('USER')")
     @GetMapping("/api/content/id/{id}")
     public ResponseEntity<ContentDto> getContentById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(

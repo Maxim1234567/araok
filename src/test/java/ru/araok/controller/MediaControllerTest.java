@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import ru.araok.dto.AgeLimitDto;
 import ru.araok.dto.ContentDto;
 import ru.araok.dto.ContentMediaDto;
@@ -14,6 +17,7 @@ import ru.araok.dto.ContentMediaIdDto;
 import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MediaTypeDto;
 import ru.araok.dto.UserDto;
+import ru.araok.filter.JwtFilter;
 import ru.araok.service.MediaService;
 
 import java.time.LocalDate;
@@ -23,6 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,8 +76,14 @@ public class MediaControllerTest {
     @MockBean
     private MediaService mediaService;
 
+    @MockBean
+    private JwtFilter jwtFilter;
+
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private ObjectMapper mapper;
@@ -146,9 +157,12 @@ public class MediaControllerTest {
                 .contentMediaId(contentMediaId)
                 .media(video)
                 .build();
+
+        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectReturnMediaByContentIdAndTypeId() throws Exception {
         given(mediaService.findMediaByContentIdAndTypeId(eq(CONTENT_ID), eq(TYPE_ID)))
                 .willReturn(video);
@@ -163,11 +177,12 @@ public class MediaControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectSaveContentMedia() throws Exception {
         given(mediaService.save(any(ContentMediaDto.class)))
                 .willReturn(contentMedia);
 
-        mvc.perform(post("/api/media")
+        mvc.perform(post("/api/media").with(csrf())
                 .header("Accept", "application/json")
                 .header("Content-Type", "application/json")
                 .content(mapper.writeValueAsString(contentMedia))

@@ -7,13 +7,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import ru.araok.dto.AgeLimitDto;
 import ru.araok.dto.ContentDto;
 import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MediaSubtitleDto;
 import ru.araok.dto.SubtitleDto;
 import ru.araok.dto.UserDto;
+import ru.araok.filter.JwtFilter;
 import ru.araok.service.MediaSubtitleService;
 
 import java.time.LocalDate;
@@ -24,6 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -92,10 +97,16 @@ public class MediaSubtitleControllerTest {
     private MockMvc mvc;
 
     @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    @Autowired
     private ObjectMapper mapper;
 
     @MockBean
     private MediaSubtitleService mediaSubtitleService;
+
+    @MockBean
+    private JwtFilter jwtFilter;
 
     private MediaSubtitleDto mediaSubtitle;
 
@@ -161,9 +172,12 @@ public class MediaSubtitleControllerTest {
                 )
                 .content(content)
                 .build();
+
+        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectReturnSubtitleById() throws Exception {
         given(mediaSubtitleService.findMediaSubtitleByContentIdAndLanguageId(eq(mediaSubtitle.getContent().getId()), eq(mediaSubtitle.getLanguage().getId())))
                 .willReturn(mediaSubtitle);
@@ -177,11 +191,12 @@ public class MediaSubtitleControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectSaveSubtitle() throws Exception {
         given(mediaSubtitleService.save(any(MediaSubtitleDto.class)))
                 .willReturn(mediaSubtitle);
 
-        mvc.perform(post("/api/subtitle")
+        mvc.perform(post("/api/subtitle").with(csrf())
                 .header("Accept", "application/json")
                 .header("Content-Type", "application/json")
                 .content(mapper.writeValueAsString(mediaSubtitle))

@@ -1,29 +1,22 @@
 package ru.araok.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import ru.araok.constant.TypeContent;
-import ru.araok.domain.ContentMedia;
-import ru.araok.domain.ContentMediaId;
-import ru.araok.domain.MediaSubtitle;
-import ru.araok.domain.MediaType;
-import ru.araok.domain.Subtitle;
 import ru.araok.dto.AgeLimitDto;
 import ru.araok.dto.ContentDto;
-import ru.araok.dto.ContentMediaDto;
-import ru.araok.dto.ContentMediaIdDto;
 import ru.araok.dto.ContentWithContentMediaAndMediaSubtitleDto;
 import ru.araok.dto.LanguageDto;
-import ru.araok.dto.MediaSubtitleDto;
-import ru.araok.dto.MediaTypeDto;
-import ru.araok.dto.SubtitleDto;
 import ru.araok.dto.UserDto;
+import ru.araok.filter.JwtFilter;
 import ru.araok.service.ContentService;
 
 import java.time.LocalDate;
@@ -35,6 +28,7 @@ import static org.mockito.BDDMockito.given;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -310,8 +304,14 @@ public class ContentControllerTest {
     @MockBean
     private ContentService contentService;
 
+    @MockBean
+    private JwtFilter jwtFilter;
+
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private ObjectMapper mapper;
@@ -398,9 +398,12 @@ public class ContentControllerTest {
         contents = List.of(
                 content1, content2, content3
         );
+
+        mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectReturnAllContents() throws Exception {
         given(contentService.findContentsByType(eq(TypeContent.ALL)))
                 .willReturn(contents);
@@ -417,6 +420,7 @@ public class ContentControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void shouldCorrectReturnNewContents() throws Exception {
         given(contentService.findContentsByType(eq(TypeContent.NEW)))
                 .willReturn(contents);
@@ -433,6 +437,7 @@ public class ContentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectReturnPopularContents() throws Exception {
         given(contentService.findContentsByType(eq(TypeContent.POPULAR)))
                 .willReturn(contents);
@@ -449,6 +454,7 @@ public class ContentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectReturnRecommendedContents() throws Exception {
         given(contentService.findContentsByType(eq(TypeContent.RECOMMENDED)))
                 .willReturn(contents);
@@ -465,6 +471,7 @@ public class ContentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectReturnContentsByName() throws Exception {
         given(contentService.findContentsByName(eq("unknown")))
                 .willReturn(contents);
@@ -480,6 +487,7 @@ public class ContentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectReturnContentById() throws Exception {
         given(contentService.findContentById(eq(1L)))
                 .willReturn(contents.get(0));
@@ -495,11 +503,13 @@ public class ContentControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void shouldCorrectSaveContentWithContentMediaAndSubtitle() throws Exception {
         given(contentService.save(any(ContentWithContentMediaAndMediaSubtitleDto.class)))
                 .willReturn(ContentDto.builder().build());
 
         mvc.perform(post("/api/content")
+                        .with(csrf())
                 .header("Accept", "application/json")
                 .header("Content-Type", "application/json")
                 .content(JSON_CONTENT_WITH_CONTENT_MEDIA_AND_MEDIA_SUBTITLE)
