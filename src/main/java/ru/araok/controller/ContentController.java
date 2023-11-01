@@ -22,7 +22,6 @@ import java.util.List;
 public class ContentController {
     private final ContentService contentService;
 
-    @PreAuthorize("hasAnyAuthority('USER')")
     @GetMapping("/api/content")
     public ResponseEntity<List<ContentDto>> getContents(@RequestParam("type") TypeContent type) {
         return ResponseEntity.ok(
@@ -35,7 +34,6 @@ public class ContentController {
         return ResponseEntity.ok(contentService.findContentsByName(name));
     }
 
-    @PreAuthorize("hasAnyAuthority('USER')")
     @GetMapping("/api/content/id/{id}")
     public ResponseEntity<ContentDto> getContentById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(

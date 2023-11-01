@@ -106,7 +106,7 @@ public class ContentServiceTest {
     @BeforeEach
     public void setUp() {
         contentService = new ContentServiceImpl(
-                new ApplicationProperties(1000L),
+                new ApplicationProperties(1000L, null),
                 contentRepository,
                 contentMediaRepository,
                 mediaSubtitleRepository,
