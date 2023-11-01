@@ -38,7 +38,7 @@ public class FilterRequestMatcherTest {
         );
 
         RequestProperties request3 = new RequestProperties(
-                "^(http|https)://(.+):[0-9]+/api/content/[0-9a-zA-Zà-ÿÀ-ß ]+$",
+                "^(http|https)://(.+):[0-9]+/api/content/[0-9a-zA-Z ]+$",
                 "GET"
         );
 
