@@ -33,6 +33,8 @@ import java.util.Map;
 public class TestHttpServletRequest implements HttpServletRequest {
     private String requestURI;
 
+    private String requestURL;
+
     private HttpMethod method;
 
     @Override
@@ -117,7 +119,7 @@ public class TestHttpServletRequest implements HttpServletRequest {
 
     @Override
     public StringBuffer getRequestURL() {
-        return null;
+        return new StringBuffer(requestURL);
     }
 
     @Override

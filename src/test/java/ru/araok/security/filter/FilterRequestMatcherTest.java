@@ -115,6 +115,7 @@ public class FilterRequestMatcherTest {
 
         HttpServletRequest request = TestHttpServletRequest.builder()
                 .requestURI(url)
+                .requestURL(url)
                 .method(HttpMethod.GET)
                 .build();
 
@@ -127,6 +128,7 @@ public class FilterRequestMatcherTest {
 
         HttpServletRequest request = TestHttpServletRequest.builder()
                 .requestURI(url)
+                .requestURL(url)
                 .method(HttpMethod.GET)
                 .build();
 
