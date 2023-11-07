@@ -1,6 +1,7 @@
 package ru.araok.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,7 @@ import ru.araok.service.ContentService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ContentController {
@@ -24,6 +26,8 @@ public class ContentController {
 
     @GetMapping("/api/content")
     public ResponseEntity<List<ContentDto>> getContents(@RequestParam("type") TypeContent type) {
+        log.info("/api/content");
+
         return ResponseEntity.ok(
                 contentService.findContentsByType(type)
         );
@@ -31,11 +35,15 @@ public class ContentController {
 
     @GetMapping("/api/content/{name}")
     public ResponseEntity<List<ContentDto>> getContentsByName(@PathVariable("name") String name) {
+        log.info("/api/content/{}", name);
+
         return ResponseEntity.ok(contentService.findContentsByName(name));
     }
 
     @GetMapping("/api/content/id/{id}")
     public ResponseEntity<ContentDto> getContentById(@PathVariable("id") Long id) {
+        log.info("/api/content/id/{}", id);
+
         return ResponseEntity.ok(
                 contentService.findContentById(id)
         );
@@ -43,6 +51,8 @@ public class ContentController {
 
     @PostMapping("/api/content")
     public ResponseEntity<String> save(@RequestBody ContentWithContentMediaAndMediaSubtitleDto content) {
+        log.info("/api/content");
+
         contentService.save(content);
         return ResponseEntity.status(HttpStatus.CREATED).body("OK");
     }

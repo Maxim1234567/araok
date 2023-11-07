@@ -1,6 +1,7 @@
 package ru.araok.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.araok.dto.ContentDto;
 import ru.araok.dto.ContentMediaDto;
@@ -11,6 +12,7 @@ import ru.araok.service.ContentService;
 import ru.araok.service.MediaService;
 import ru.araok.service.MediaTypeService;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MediaServiceImpl implements MediaService {
@@ -22,6 +24,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public byte[] findMediaByContentIdAndTypeId(Long contentId, Long typeId) {
+        log.info("find media by content id: {} and type id: {}", contentId, typeId);
+
         ContentDto content = contentService.findContentById(contentId);
         MediaTypeDto mediaType = mediaTypeService.findById(typeId);
 
@@ -35,6 +39,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public ContentMediaDto save(ContentMediaDto contentMediaDto) {
+        log.info("save content media");
+
         return contentMediaService.save(contentMediaDto);
     }
 }

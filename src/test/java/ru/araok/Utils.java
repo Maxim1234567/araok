@@ -90,10 +90,10 @@ public class Utils {
 
     @Test
     public void test() throws IOException {
-        File file = new File("C:\\Users\\user\\Downloads\\videoplayback.mp4");
+        File file = new File("C:\\Users\\user\\Desktop\\ARAOK\\data\\data5\\image5.png");
         byte[] bytes = Files.readAllBytes(file.toPath());
 
-        try (PrintWriter fos = new PrintWriter("C:\\Users\\user\\Downloads\\videoplayback.txt")) {
+        try (PrintWriter fos = new PrintWriter("C:\\Users\\user\\Desktop\\ARAOK\\data\\data5\\image5.txt")) {
             for(byte b: bytes)
                 fos.write(b + ", ");
         }

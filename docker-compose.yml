@@ -16,13 +16,32 @@ services:
       backend:
         aliases:
           - "araok-eureka-server"
+  araok-authorization-service:
+    image: "araok-authorization-service"
+    environment:
+      - MY_SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-araok-db:5432/araok
+      - MY_EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://araok-eureka-server:8761/eureka
+      - MY_MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - SPRING_CLOUD_CONFIG_URI=http://araok-configuration-server:5000
+    depends_on:
+      postgres-araok-db:
+        condition: service_healthy
+      araok-configuration-server:
+        condition: service_started
+      araok-eureka-server:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "araok-authorization-service"
   araok:
     image: "araok"
     environment:
       - MY_SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-araok-db:5432/araok
       - MY_SPRING_FLYWAY_URL=jdbc:postgresql://postgres-araok-db:5432/araok
       - SPRING_CLOUD_CONFIG_URI=http://araok-configuration-server:5000
-      - MY_EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://araok-eureka-server:8761/eureka/
+      - MY_EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://araok-eureka-server:8761/eureka
+      - MY_MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
     depends_on:
       postgres-araok-db:
         condition: service_healthy
@@ -38,7 +57,7 @@ services:
     image: "araok-api-gateway"
     environment:
       - SPRING_CLOUD_CONFIG_URI=http://araok-configuration-server:5000
-      - MY_EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://araok-eureka-server:8761/eureka/
+      - MY_EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://araok-eureka-server:8761/eureka
     ports:
       - "8765:8765"
     depends_on:
@@ -52,6 +71,24 @@ services:
       backend:
         aliases:
           - "araok-api-gateway"
+  zipkin:
+    image: openzipkin/zipkin
+    environment:
+      - ZIPKIN2_STORAGE_TYPE=postgresql
+      - ZIPKIN2_STORAGE_POSTGRESQL_HOST=localhost
+      - ZIPKIN2_STORAGE_POSTGRESQL_PORT=5432
+      - ZIPKIN2_STORAGE_POSTGRESQL_USERNAME=araok
+      - ZIPKIN2_STORAGE_POSTGRESQL_PASSWORD=araok
+      - ZIPKIN2_STORAGE_POSTGRESQL_DB=zipkin
+    depends_on:
+      postgres-araok-db:
+        condition: service_healthy
+    ports:
+      - "9411:9411"
+    networks:
+      backend:
+        aliases:
+          - "zipkin"
   postgres-araok-db:
     image: "postgres:13.3"
     environment:

@@ -8,6 +8,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.araok.service.JwtProviderService;
@@ -15,6 +16,7 @@ import ru.araok.service.JwtProviderService;
 import javax.crypto.SecretKey;
 import java.security.Key;
 
+@Slf4j
 @Component
 public class JwtProviderServiceImpl implements JwtProviderService {
 
@@ -32,6 +34,8 @@ public class JwtProviderServiceImpl implements JwtProviderService {
 
     @Override
     public boolean validateAccessToken(String refreshToken) {
+        log.info("check validation access token");
+
         return validateToken(refreshToken, jwtAccessSecret);
     }
 

@@ -1,6 +1,7 @@
 package ru.araok.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.araok.dto.MediaSubtitleDto;
 import ru.araok.service.MediaSubtitleService;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class MediaSubtitleController {
@@ -18,6 +20,8 @@ public class MediaSubtitleController {
 
     @GetMapping("/api/subtitle/{contentId}/{languageId}")
     public ResponseEntity<MediaSubtitleDto> getSubtitle(@PathVariable("contentId") Long contentId, @PathVariable("languageId") Long languageId) {
+        log.info("/api/subtitle/{}/{}", contentId, languageId);
+
         return ResponseEntity.ok(
                 mediaSubtitleService.findMediaSubtitleByContentIdAndLanguageId(
                         contentId,
@@ -28,6 +32,8 @@ public class MediaSubtitleController {
 
     @PostMapping("/api/subtitle")
     public ResponseEntity<MediaSubtitleDto> save(@RequestBody MediaSubtitleDto mediaSubtitle) {
+        log.info("/api/subtitle");
+
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 mediaSubtitleService.save(mediaSubtitle)
         );

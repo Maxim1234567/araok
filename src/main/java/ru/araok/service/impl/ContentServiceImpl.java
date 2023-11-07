@@ -1,6 +1,7 @@
 package ru.araok.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.araok.constant.TypeContent;
@@ -23,6 +24,7 @@ import ru.araok.service.PropertyProvider;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ContentServiceImpl implements ContentService {
@@ -42,6 +44,8 @@ public class ContentServiceImpl implements ContentService {
     @Override
     @Transactional(readOnly = true)
     public List<ContentDto> findContentsByType(TypeContent type) {
+        log.info("find contents by type: {}", type.name());
+
         List<ContentDto> contents = new ArrayList<>();
 
         if(type == TypeContent.ALL) {
@@ -58,6 +62,8 @@ public class ContentServiceImpl implements ContentService {
     }
 
     private List<ContentDto> getAll() {
+        log.info("return all content");
+
         return contentRepository.findAll().stream()
                 .map(ContentDto::toDto)
                 .toList();
@@ -84,6 +90,8 @@ public class ContentServiceImpl implements ContentService {
     @Override
     @Transactional(readOnly = true)
     public List<ContentDto> findContentsByName(String name) {
+        log.info("find contents by name {}", name);
+
         return contentRepository.findByNameContainingIgnoreCase(name).stream()
                 .map(ContentDto::toDto)
                 .toList();
@@ -92,6 +100,8 @@ public class ContentServiceImpl implements ContentService {
     @Override
     @Transactional(readOnly = true)
     public ContentDto findContentById(Long id) {
+        log.info("find content by id {}", id);
+
         return contentRepository.findById(id)
                 .map(ContentDto::toDto)
                 .orElseThrow(NotFoundContentException::new);
@@ -100,6 +110,8 @@ public class ContentServiceImpl implements ContentService {
     @Override
     @Transactional
     public ContentDto save(ContentWithContentMediaAndMediaSubtitleDto content) {
+        log.info("save content with content media and media subtitle");
+
         Content contentDomain = ContentDto.toDomainObject(content.getContent());
         ContentMedia preview = ContentMediaDto.toDomainObject(content.getPreview());
         ContentMedia video = ContentMediaDto.toDomainObject(content.getVideo());
