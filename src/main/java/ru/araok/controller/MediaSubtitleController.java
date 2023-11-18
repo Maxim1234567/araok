@@ -9,8 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MediaSubtitleDto;
 import ru.araok.service.MediaSubtitleService;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -36,6 +39,15 @@ public class MediaSubtitleController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 mediaSubtitleService.save(mediaSubtitle)
+        );
+    }
+
+    @GetMapping("/api/subtitle/{contentId}")
+    public ResponseEntity<List<LanguageDto>> getAllLanguage(@PathVariable("contentId") long contentId) {
+        log.info("/api/subtitle/{}", contentId);
+
+        return ResponseEntity.ok(
+                mediaSubtitleService.findAllLanguageSubtitleByContentId(contentId)
         );
     }
 }

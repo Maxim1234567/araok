@@ -11,6 +11,7 @@ import ru.araok.domain.Language;
 import ru.araok.domain.MediaSubtitle;
 import ru.araok.domain.Subtitle;
 import ru.araok.domain.User;
+import ru.araok.dto.LanguageDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -205,6 +206,38 @@ public class MediaSubtitleRepositoryTest {
         ).get();
 
         assertThatMediaSubtitle(ruSubtitle, result);
+    }
+
+    @Test
+    public void shouldCorrectReturnAllLanguageSubtitleByContentId() {
+        mediaSubtitleRepository.save(ruSubtitle);
+        mediaSubtitleRepository.save(enSubtitle);
+
+        List<Language> result = mediaSubtitleRepository.findAllLanguageSubtitleByContentId(CONTENT_ID);
+
+        assertEqualsLanguageList(
+                List.of(
+                        ruSubtitle.getLanguage(),
+                        enSubtitle.getLanguage()
+                ),
+                result
+        );
+    }
+
+    private void assertEqualsLanguageList(List<Language> excepted, List<Language> result) {
+        assertThat(result).isNotNull()
+                .hasSize(excepted.size());
+
+        for (int i = 0; i < excepted.size(); i++) {
+            assertEqualsLanguage(excepted.get(i), result.get(i));
+        }
+    }
+
+    private void assertEqualsLanguage(Language excepted, Language result) {
+        assertThat(result).isNotNull()
+                .matches(l -> l.getId().equals(excepted.getId()))
+                .matches(l -> l.getCode2().equals(excepted.getCode2()))
+                .matches(l -> l.getLanguage().equals(excepted.getLanguage()));
     }
 
     private void assertThatMediaSubtitle(MediaSubtitle expected, MediaSubtitle result) {

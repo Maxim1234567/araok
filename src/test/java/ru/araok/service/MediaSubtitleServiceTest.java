@@ -11,6 +11,7 @@ import ru.araok.domain.Language;
 import ru.araok.domain.MediaSubtitle;
 import ru.araok.domain.Subtitle;
 import ru.araok.domain.User;
+import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MediaSubtitleDto;
 import ru.araok.dto.SubtitleDto;
 import ru.araok.exception.NotFoundContentException;
@@ -39,6 +40,8 @@ public class MediaSubtitleServiceTest {
     private MediaSubtitleService mediaSubtitleService;
 
     private MediaSubtitle mediaSubtitle;
+
+    private List<Language> languages;
 
     @BeforeEach
     public void setUp() {
@@ -104,6 +107,24 @@ public class MediaSubtitleServiceTest {
                         List.of(subtitle1, subtitle2, subtitle3)
                 )
                 .build();
+
+        languages = List.of(
+                Language.builder()
+                        .id(1L)
+                        .code2("RU")
+                        .language("Russian")
+                        .build(),
+                Language.builder()
+                        .id(2L)
+                        .code2("EN")
+                        .language("English")
+                        .build(),
+                Language.builder()
+                        .id(3L)
+                        .code2("DE")
+                        .language("German")
+                        .build()
+        );
     }
 
     @Test
@@ -172,6 +193,18 @@ public class MediaSubtitleServiceTest {
         assertEqualsSubtitleList(mediaSubtitle.getSubtitles(), result.getSubtitles());
     }
 
+    @Test
+    public void shouldCorrectReturnAllLanguageByContentId() {
+        given(mediaSubtitleRepository.findAllLanguageSubtitleByContentId(eq(1L)))
+                .willReturn(languages);
+
+        List<LanguageDto> result = mediaSubtitleService.findAllLanguageSubtitleByContentId(1L);
+
+        verify(mediaSubtitleRepository, times(1)).findAllLanguageSubtitleByContentId(eq(1L));
+
+        assertEqualsLanguageList(languages, result);
+    }
+
     private void assertEqualsSubtitleList(List<Subtitle> excepted, List<SubtitleDto> result) {
         assertThat(result).isNotNull()
                 .hasSize(excepted.size());
@@ -187,5 +220,21 @@ public class MediaSubtitleServiceTest {
                 .matches(s -> s.getLine().equals(excepted.getLine()))
                 .matches(s -> s.getFrom().equals(excepted.getFrom()))
                 .matches(s -> s.getTo().equals(excepted.getTo()));
+    }
+
+    private void assertEqualsLanguageList(List<Language> excepted, List<LanguageDto> result) {
+        assertThat(result).isNotNull()
+                .hasSize(excepted.size());
+
+        for (int i = 0; i < excepted.size(); i++) {
+            assertEqualsLanguage(excepted.get(i), result.get(i));
+        }
+    }
+
+    private void assertEqualsLanguage(Language excepted, LanguageDto result) {
+        assertThat(result).isNotNull()
+                .matches(l -> l.getId().equals(excepted.getId()))
+                .matches(l -> l.getCode2().equals(excepted.getCode2()))
+                .matches(l -> l.getLanguage().equals(excepted.getLanguage()));
     }
 }

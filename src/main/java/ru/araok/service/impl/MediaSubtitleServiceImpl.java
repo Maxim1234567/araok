@@ -4,10 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.araok.domain.Language;
+import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MediaSubtitleDto;
 import ru.araok.exception.NotFoundContentException;
 import ru.araok.repository.MediaSubtitleRepository;
 import ru.araok.service.MediaSubtitleService;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -36,5 +40,15 @@ public class MediaSubtitleServiceImpl implements MediaSubtitleService {
                 .findByContentIdAndLanguageId(contentId, languageId)
                 .map(MediaSubtitleDto::toDto)
                 .orElseThrow(NotFoundContentException::new);
+    }
+
+    @Override
+    public List<LanguageDto> findAllLanguageSubtitleByContentId(long contentId) {
+        log.info("return all language by content id {}", contentId);
+
+        return mediaSubtitleRepository.findAllLanguageSubtitleByContentId(contentId)
+                .stream()
+                .map(LanguageDto::toDto)
+                .toList();
     }
 }

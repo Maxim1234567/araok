@@ -1,6 +1,5 @@
 package ru.araok.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +35,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(MediaSubtitleController.class)
 public class MediaSubtitleControllerTest {
+
+    private static final String JSON_LANGUAGE =
+            """
+                            [
+                                {
+                                    "id": 1,
+                                    "language": "Russian",
+                                    "code2": "RU"
+                                },
+                                {
+                                    "id": 2,
+                                    "language": "English",
+                                    "code2": "EN"
+                                },
+                                {
+                                    "id": 3,
+                                    "language": "German",
+                                    "code2": "DE"
+                                }
+                            ]
+                    """;
 
     private static final String JSON_MEDIA_SUBTITLE =
             """
@@ -110,6 +130,8 @@ public class MediaSubtitleControllerTest {
 
     private MediaSubtitleDto mediaSubtitle;
 
+    private List<LanguageDto> languages;
+
     @BeforeEach
     public void setUp() {
         AgeLimitDto limit = AgeLimitDto.builder()
@@ -173,6 +195,24 @@ public class MediaSubtitleControllerTest {
                 .content(content)
                 .build();
 
+        languages = List.of(
+                LanguageDto.builder()
+                        .id(1L)
+                        .code2("RU")
+                        .language("Russian")
+                        .build(),
+                LanguageDto.builder()
+                        .id(2L)
+                        .code2("EN")
+                        .language("English")
+                        .build(),
+                LanguageDto.builder()
+                        .id(3L)
+                        .code2("DE")
+                        .language("German")
+                        .build()
+        );
+
         mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
@@ -188,6 +228,20 @@ public class MediaSubtitleControllerTest {
 
         verify(mediaSubtitleService, times(1))
                 .findMediaSubtitleByContentIdAndLanguageId(mediaSubtitle.getContent().getId(), mediaSubtitle.getLanguage().getId());
+    }
+
+    @Test
+    @WithMockUser(username = "user")
+    public void shouldCorrectReturnAllLanguageByContentId() throws Exception {
+        given(mediaSubtitleService.findAllLanguageSubtitleByContentId(1L))
+                .willReturn(languages);
+
+        mvc.perform(get("/api/subtitle/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(JSON_LANGUAGE));
+
+        verify(mediaSubtitleService, times(1))
+                .findAllLanguageSubtitleByContentId(1L);
     }
 
     @Test
