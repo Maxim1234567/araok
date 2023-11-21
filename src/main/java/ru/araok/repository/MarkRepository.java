@@ -1,0 +1,7 @@
+package ru.araok.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.araok.domain.Mark;
+
+public interface MarkRepository extends JpaRepository<Mark, Long> {
+}
