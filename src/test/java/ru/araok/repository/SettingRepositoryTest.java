@@ -12,11 +12,16 @@ import ru.araok.domain.Language;
 import ru.araok.domain.Mark;
 import ru.araok.domain.Setting;
 import ru.araok.domain.User;
+import ru.araok.exception.NotFoundContentException;
+import ru.araok.exception.NotFoundSettingException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -114,6 +119,29 @@ public class SettingRepositoryTest {
     }
 
     @Test
+    public void shouldCorrectDeleteSetting() {
+        settingRepository.save(setting);
+
+        Setting result = settingRepository.findByContentId(setting.getContent().getId()).get();
+
+        assertThat(result)
+                .matches(s -> Objects.nonNull(s.getId()));
+        assertThat(result.getMarks()).isNotNull()
+                .allMatch(m -> Objects.nonNull(m.getId()));
+
+        assertThatSetting(setting, result);
+
+        em.clear();
+
+        settingRepository.deleteByContentId(result.getContent().getId());
+        markRepository.deleteAllById(result.getMarks().stream().map(Mark::getId).toList());
+
+        assertThrows(NotFoundSettingException.class, () -> settingRepository.findById(result.getId()).orElseThrow(NotFoundSettingException::new));
+        for (Mark mark: setting.getMarks())
+            assertThrows(NotFoundSettingException.class, () -> markRepository.findById(mark.getId()).orElseThrow(NotFoundSettingException::new));
+    }
+
+    @Test
     public void shouldCorrectUpdateSetting() {
         Setting saveSetting = settingRepository.save(setting);
 
@@ -156,11 +184,20 @@ public class SettingRepositoryTest {
         em.clear();
 
         markRepository.saveAll(newSetting.getMarks());
-
         settingRepository.save(newSetting);
+
         Setting result = settingRepository.findById(newSetting.getId()).get();
 
         assertThatSetting(newSetting, result);
+    }
+
+    @Test
+    public void shouldCorrectReturnSettingByContentId() {
+        settingRepository.save(setting);
+
+        Setting result = settingRepository.findByContentId(setting.getContent().getId()).get();
+
+        assertThatSetting(setting, result);
     }
 
     private void assertThatSetting(Setting expected, Setting result) {
