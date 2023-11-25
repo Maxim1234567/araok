@@ -78,7 +78,7 @@ public class ContentRepositoryTest {
                 .limit(limitAfter7days)
                 .artist("Unknown Artist 2")
                 .user(user)
-                .createDate(LocalDate.now().plusDays(8))
+                .createDate(LocalDate.now().plusDays(-8))
                 .language(languageAfter7days)
                 .build();
     }

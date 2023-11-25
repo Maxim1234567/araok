@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ContentRepository extends JpaRepository<Content, Long> {
-    @Query("select c from Content c where c.createDate <= (CURRENT_DATE + 7 DAY)")
+    @Query("select c from Content c where (c.createDate + 7 DAY) >= CURRENT_DATE")
     List<Content> findByCreateDateLessThanNow();
 
     List<Content> findByNameContainingIgnoreCase(String name);
