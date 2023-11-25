@@ -12,7 +12,9 @@ import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MarkDto;
 import ru.araok.dto.SettingDto;
 import ru.araok.dto.UserDto;
+import ru.araok.exception.NotFoundContentException;
 import ru.araok.exception.NotFoundSettingException;
+import ru.araok.repository.ContentRepository;
 import ru.araok.repository.MarkRepository;
 import ru.araok.repository.SettingRepository;
 import ru.araok.service.impl.SettingServiceImpl;
@@ -37,6 +39,9 @@ public class SettingServiceTest {
 
     @Mock
     private SettingRepository settingRepository;
+
+    @Mock
+    private ContentRepository contentRepository;
 
     private SettingService settingService;
 
@@ -105,7 +110,8 @@ public class SettingServiceTest {
 
         settingService = new SettingServiceImpl(
                 markRepository,
-                settingRepository
+                settingRepository,
+                contentRepository
         );
     }
 
@@ -132,6 +138,8 @@ public class SettingServiceTest {
                 .willReturn(Optional.empty());
         given(settingRepository.save(any(Setting.class)))
                 .willReturn(SettingDto.toDomainObject(setting));
+        given(contentRepository.findById(eq(setting.getContent().getId())))
+                .willReturn(Optional.of(ContentDto.toDomainObject(setting.getContent())));
 
         SettingDto result = assertDoesNotThrow(() -> settingService.save(setting));
 
@@ -139,8 +147,27 @@ public class SettingServiceTest {
                 .findByContentId(eq(setting.getContent().getId()));
         verify(settingRepository, times(1))
                 .save(any(Setting.class));
+        verify(contentRepository, times(1))
+                .findById(eq(setting.getContent().getId()));
 
         assertThatSetting(setting, result);
+    }
+
+    @Test
+    public void shouldThrowNotFoundContentIfOptionalEmptyAndContentNotFound() {
+        given(settingRepository.findByContentId(eq(setting.getContent().getId())))
+                .willReturn(Optional.empty());
+        given(contentRepository.findById(eq(setting.getContent().getId())))
+                .willReturn(Optional.empty());
+
+        assertThrows(NotFoundContentException.class, () -> settingService.save(setting));
+
+        verify(settingRepository, times(1))
+                .findByContentId(eq(setting.getContent().getId()));
+        verify(settingRepository, times(0))
+                .save(any(Setting.class));
+        verify(contentRepository, times(1))
+                .findById(eq(setting.getContent().getId()));
     }
 
     @Test
