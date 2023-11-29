@@ -52,9 +52,9 @@ public class SettingRepositoryTest {
                 .build();
 
         User user = User.builder()
-                .id(1L)
+                .id(1000000000L)
                 .name("Maxim")
-                .phone("89993338951")
+                .phone("9993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
                 .role("USER")
