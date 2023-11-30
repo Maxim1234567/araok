@@ -12,6 +12,7 @@ import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MarkDto;
 import ru.araok.dto.SettingDto;
 import ru.araok.dto.UserDto;
+import ru.araok.enums.RoleEnum;
 import ru.araok.exception.NotFoundContentException;
 import ru.araok.exception.NotFoundSettingException;
 import ru.araok.repository.ContentRepository;
@@ -61,7 +62,7 @@ public class SettingServiceTest {
                 .phone("89993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         LanguageDto language = LanguageDto.builder()

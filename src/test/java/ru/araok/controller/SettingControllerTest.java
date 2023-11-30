@@ -1,6 +1,5 @@
 package ru.araok.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,8 @@ import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MarkDto;
 import ru.araok.dto.SettingDto;
 import ru.araok.dto.UserDto;
-import ru.araok.filter.JwtFilter;
+import ru.araok.enums.RoleEnum;
+import ru.araok.security.filter.JwtFilter;
 import ru.araok.service.SettingService;
 
 import java.time.LocalDate;
@@ -30,7 +30,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -122,7 +121,7 @@ public class SettingControllerTest {
                 .phone("89993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         LanguageDto language = LanguageDto.builder()

@@ -12,6 +12,7 @@ import ru.araok.domain.Language;
 import ru.araok.domain.Mark;
 import ru.araok.domain.Setting;
 import ru.araok.domain.User;
+import ru.araok.enums.RoleEnum;
 import ru.araok.exception.NotFoundContentException;
 import ru.araok.exception.NotFoundSettingException;
 
@@ -57,7 +58,7 @@ public class SettingRepositoryTest {
                 .phone("9993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         Language language = Language.builder()

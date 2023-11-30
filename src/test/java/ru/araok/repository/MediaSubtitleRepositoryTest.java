@@ -12,6 +12,7 @@ import ru.araok.domain.MediaSubtitle;
 import ru.araok.domain.Subtitle;
 import ru.araok.domain.User;
 import ru.araok.dto.LanguageDto;
+import ru.araok.enums.RoleEnum;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -48,7 +49,7 @@ public class MediaSubtitleRepositoryTest {
                 .phone("9993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         Language language = Language.builder()

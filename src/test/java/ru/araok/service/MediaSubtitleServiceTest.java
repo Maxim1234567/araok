@@ -14,6 +14,7 @@ import ru.araok.domain.User;
 import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MediaSubtitleDto;
 import ru.araok.dto.SubtitleDto;
+import ru.araok.enums.RoleEnum;
 import ru.araok.exception.NotFoundContentException;
 import ru.araok.repository.MediaSubtitleRepository;
 import ru.araok.service.impl.MediaSubtitleServiceImpl;
@@ -80,7 +81,7 @@ public class MediaSubtitleServiceTest {
                 .phone("89993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         Language language = Language.builder()

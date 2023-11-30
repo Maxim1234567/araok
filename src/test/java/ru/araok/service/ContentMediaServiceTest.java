@@ -14,6 +14,7 @@ import ru.araok.domain.MediaType;
 import ru.araok.domain.User;
 import ru.araok.dto.ContentMediaDto;
 import ru.araok.dto.ContentMediaIdDto;
+import ru.araok.enums.RoleEnum;
 import ru.araok.exception.NotFoundContentException;
 import ru.araok.repository.ContentMediaRepository;
 import ru.araok.service.impl.ContentMediaServiceImpl;
@@ -70,7 +71,7 @@ public class ContentMediaServiceTest {
                 .phone("89993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         Language language = Language.builder()

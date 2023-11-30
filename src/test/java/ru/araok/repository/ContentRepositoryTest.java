@@ -9,6 +9,7 @@ import ru.araok.domain.AgeLimit;
 import ru.araok.domain.Content;
 import ru.araok.domain.Language;
 import ru.araok.domain.User;
+import ru.araok.enums.RoleEnum;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -59,7 +60,7 @@ public class ContentRepositoryTest {
                 .phone("9993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         contentBefore7days = Content.builder()

@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import ru.araok.dto.AgeLimitDto;
-import ru.araok.filter.JwtFilter;
+import ru.araok.security.filter.JwtFilter;
 import ru.araok.service.AgeLimitService;
 
 import java.util.List;

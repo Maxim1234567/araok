@@ -17,7 +17,8 @@ import ru.araok.dto.ContentMediaIdDto;
 import ru.araok.dto.LanguageDto;
 import ru.araok.dto.MediaTypeDto;
 import ru.araok.dto.UserDto;
-import ru.araok.filter.JwtFilter;
+import ru.araok.enums.RoleEnum;
+import ru.araok.security.filter.JwtFilter;
 import ru.araok.service.MediaService;
 
 import java.time.LocalDate;
@@ -124,7 +125,7 @@ public class MediaControllerTest {
                 .phone("89993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         LanguageDto language = LanguageDto.builder()

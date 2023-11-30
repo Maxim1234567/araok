@@ -10,6 +10,7 @@ import ru.araok.domain.Content;
 import ru.araok.domain.ContentCounter;
 import ru.araok.domain.Language;
 import ru.araok.domain.User;
+import ru.araok.enums.RoleEnum;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -77,7 +78,7 @@ public class ContentCounterRepositoryTest {
                 .phone("9993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         Content content1 = Content.builder()

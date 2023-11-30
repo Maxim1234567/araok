@@ -16,7 +16,8 @@ import ru.araok.dto.ContentDto;
 import ru.araok.dto.ContentWithContentMediaAndMediaSubtitleDto;
 import ru.araok.dto.LanguageDto;
 import ru.araok.dto.UserDto;
-import ru.araok.filter.JwtFilter;
+import ru.araok.enums.RoleEnum;
+import ru.araok.security.filter.JwtFilter;
 import ru.araok.service.ContentService;
 
 import java.time.LocalDate;
@@ -362,7 +363,7 @@ public class ContentControllerTest {
                 .phone("89993338951")
                 .password("12345")
                 .birthDate(LocalDate.of(1994, 8, 5))
-                .role("USER")
+                .role(RoleEnum.USER)
                 .build();
 
         ContentDto content1 = ContentDto.builder()
