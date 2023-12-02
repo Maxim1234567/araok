@@ -43,6 +43,7 @@ public class MediaSubtitleServiceImpl implements MediaSubtitleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<LanguageDto> findAllLanguageSubtitleByContentId(long contentId) {
         log.info("return all language by content id {}", contentId);
 
